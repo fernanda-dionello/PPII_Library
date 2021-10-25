@@ -1,0 +1,1 @@
+const user_repository = require('../repository/user_repository');

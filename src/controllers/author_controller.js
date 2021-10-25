@@ -1,0 +1,1 @@
+const author_repository = require('../repository/author_repository');
