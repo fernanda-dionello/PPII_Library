@@ -1,0 +1,1 @@
+const client_repository = require('../repository/client_repository');
