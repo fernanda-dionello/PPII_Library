@@ -3,7 +3,7 @@ const client_repository = require('../repository/client_repository');
 exports.listClients = (req, resp) => {
     client_repository.getClients((err, res) => {
         if(err){
-            resp.status(500).json(err.message);
+            resp.status(500).json({err: err.message});
         } else if (res.rowCount == 0) {
             resp.status(404).json({msg: 'No clients found.'});
         } else {
@@ -13,13 +13,13 @@ exports.listClients = (req, resp) => {
 };
 
 exports.listClientsById = (req, resp) => {
-    const id = req.params.id;
+    const registration_number = req.params.registration_number;
 
-    client_repository.getClientById(id, (err, res) => {
+    client_repository.getClientById(registration_number, (err, res) => {
         if(err){
-            resp.status(500).json(err.message);
+            resp.status(500).json({err: err.message});
         } else if (res.rowCount == 0) {
-            resp.status(404).json({msg: `The client with id ${id} not found.`});
+            resp.status(404).json({msg: `The client with registration number ${registration_number} not found.`});
         } else {
             resp.json(res.rows);
         };
@@ -27,11 +27,12 @@ exports.listClientsById = (req, resp) => {
 };
 
 exports.createClients = (req, resp) => {
-    let client = req.body;
+    const name = req.body.name.toUpperCase();
+    const cellphone = req.body.cellphone;
 
-    client_repository.postClient(client, (err, res) => {
+    client_repository.postClient(name, cellphone, (err, res) => {
         if(err){
-            resp.status(500).json(err.message);
+            resp.status(500).json({err: err.message});
         } else {
             resp.status(201).json({msg: 'Client created!', client: res.rows});
         };
@@ -39,28 +40,29 @@ exports.createClients = (req, resp) => {
 };
 
 exports.updateClients = (req, resp) => {
-    const id = req.params.id;
-    const newClient = req.body;
+    const registration_number = req.params.registration_number;
+    const name = req.body.name.toUpperCase();
+    const cellphone = req.body.cellphone;
 
-    client_repository.putClient(id, newClient, (err, res) => {
+    client_repository.putClient(registration_number, name, cellphone, (err, res) => {
         if(err){
-            resp.status(500).json(err.message);
+            resp.status(500).json({err: err.message});
         } else if (res.rowCount == 0) {
-            resp.status(404).json({msg: `The client with id ${id} not found.`});
+            resp.status(404).json({msg: `The client with registration number ${registration_number} not found.`});
         } else {
-            resp.json({msg: `The client with id ${id} updated!`, newClient: res.rows});
+            resp.json({msg: `The client with registration number ${registration_number} updated!`, newClient: res.rows});
         };
     });
 };
 
 exports.removeClients = (req, resp) => {
-    const id = req.params.id;
+    const registration_number = req.params.registration_number;
 
-    client_repository.deleteClient(id, (err, res) => {
+    client_repository.deleteClient(registration_number, (err, res) => {
         if(err){
-            resp.status(500).json(err.message);
+            resp.status(500).json({err: err.message});
         } else if (res.rowCount == 0) {
-            resp.status(404).json({msg: `The client with id ${id} not found.`});
+            resp.status(404).json({msg: `The client with registration number ${registration_number} not found.`});
         } else {
             resp.json({msg: 'Client deleted!', client: res.rows});
         };

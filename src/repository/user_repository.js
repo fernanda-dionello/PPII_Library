@@ -1,11 +1,8 @@
-const { Client } = require('pg');
-const dotenv = require('dotenv');
-dotenv.config();
+const connection = require('../config/connection_bd');
 
-const connection = {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD
+exports.postLogin = (login, callback) => {
+    const values = [login.username, login.password];
+    connection.query('SELECT * FROM users WHERE username = $1 AND password = sha1($2)', values, (err, res) => {
+        callback(err,res);
+    });
 };

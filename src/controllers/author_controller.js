@@ -1,9 +1,10 @@
 const author_repository = require('../repository/author_repository');
+const country_repository = require('../repository/country_repository');
 
 exports.listAuthors = (req, resp) => {
     author_repository.getAuthors((err, res) => {
         if(err){
-            resp.status(500).json(err.message);
+            resp.status(500).json({err: err.message});
         } else if (res.rowCount == 0) {
             resp.status(404).json({msg: 'No authors found.'});
         } else {
@@ -17,7 +18,7 @@ exports.listAuthorsById = (req, resp) => {
 
     author_repository.getAuthorById(id, (err, res) => {
         if(err){
-            resp.status(500).json(err.message);
+            resp.status(500).json({err: err.message});
         } else if (res.rowCount == 0) {
             resp.status(404).json({msg: `The author with id ${id} not found.`});
         } else {
@@ -27,28 +28,50 @@ exports.listAuthorsById = (req, resp) => {
 };
 
 exports.createAuthors = (req, resp) => {
-    let author = req.body;
-
-    author_repository.postAuthor(author, (err, res) => {
+    let countryName = req.body.country.toUpperCase();
+    let authorName = req.body.name.toUpperCase();
+    let countryId;
+    
+    country_repository.getCountryByName(countryName, (err, res) => {
         if(err){
-            resp.status(500).json(err.message);
+            resp.status(500).json({err: err.message});
+        } else if (res.rowCount == 0) {
+            resp.status(404).json({msg: `Cannot create a new Author, because the country ${countryName} don't exist in countries table.`});
         } else {
-            resp.status(201).json({msg: 'Author created!', author: res.rows});
+            countryId = res.rows[0].id;
+            author_repository.postAuthor(authorName, countryId, (err, res) => {
+                if(err){
+                    resp.status(500).json({err: err.message});
+                } else {
+                    resp.status(201).json({msg: 'Author created!', author: res.rows});
+                };
+            });
         };
     });
 };
 
 exports.updateAuthors = (req, resp) => {
     const id = req.params.id;
-    const newAuthor = req.body;
+    let countryName = req.body.country.toUpperCase();
+    let authorName = req.body.name.toUpperCase();
+    let countryId;
 
-    author_repository.putAuthor(id, newAuthor, (err, res) => {
+    country_repository.getCountryByName(countryName, (err, res) => {
         if(err){
-            resp.status(500).json(err.message);
+            resp.status(500).json({err: err.message});
         } else if (res.rowCount == 0) {
-            resp.status(404).json({msg: `The author with id ${id} not found.`});
+            resp.status(404).json({msg: `Cannot update the author, because the country ${countryName} don't exist in countries table.`});
         } else {
-            resp.json({msg: `The author with id ${id} updated!`, newAuthor: res.rows});
+            countryId = res.rows[0].id;
+            author_repository.putAuthor(id, authorName, countryId, (err, res) => {
+                if(err){
+                    resp.status(500).json({err: err.message});
+                } else if (res.rowCount == 0) {
+                    resp.status(404).json({msg: `The author with id ${id} not found.`});
+                } else {
+                    resp.json({msg: `The author with id ${id} updated!`, newAuthor: res.rows});
+                };
+            });
         };
     });
 };
@@ -58,7 +81,7 @@ exports.removeAuthors = (req, resp) => {
 
     author_repository.deleteAuthor(id, (err, res) => {
         if(err){
-            resp.status(500).json(err.message);
+            resp.status(500).json({err: err.message});
         } else if (res.rowCount == 0) {
             resp.status(404).json({msg: `The author with id ${id} not found.`});
         } else {
