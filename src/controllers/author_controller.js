@@ -1,4 +1,3 @@
-const e = require('express');
 const author_repository = require('../repository/author_repository');
 const country_repository = require('../repository/country_repository');
 
@@ -66,7 +65,7 @@ exports.updateAuthors = (req, resp) => {
     let authorName = req.body.name;
     let countryId;
 
-    if(authorName && countryName){
+    if(authorName && countryName && id){
         countryName = countryName.toUpperCase();
         authorName = authorName.toUpperCase();
         country_repository.getCountryByName(countryName, (err, res) => {

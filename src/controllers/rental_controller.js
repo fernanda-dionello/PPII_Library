@@ -1,4 +1,3 @@
-const { response } = require('express');
 const rental_repository = require('../repository/rental_repository');
 
 exports.borrow = (req, resp) => {
