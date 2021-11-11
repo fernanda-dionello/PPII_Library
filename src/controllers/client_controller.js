@@ -27,32 +27,42 @@ exports.listClientsById = (req, resp) => {
 };
 
 exports.createClients = (req, resp) => {
-    const name = req.body.name.toUpperCase();
+    let name = req.body.name;
     const cellphone = req.body.cellphone;
 
-    client_repository.postClient(name, cellphone, (err, res) => {
-        if(err){
-            resp.status(500).json({err: err.message});
-        } else {
-            resp.status(201).json({msg: 'Client created!', client: res.rows});
-        };
-    });
+    if(name && cellphone){
+        name = name.toUpperCase();
+        client_repository.postClient(name, cellphone, (err, res) => {
+            if(err){
+                resp.status(500).json({err: err.message});
+            } else {
+                resp.status(201).json({msg: 'Client created!', client: res.rows});
+            };
+        });
+    } else {
+        resp.status(400).json({msg:"Invalid data entry"});
+    };
 };
 
 exports.updateClients = (req, resp) => {
     const registration_number = req.params.registration_number;
-    const name = req.body.name.toUpperCase();
     const cellphone = req.body.cellphone;
+    let name = req.body.name;
 
-    client_repository.putClient(registration_number, name, cellphone, (err, res) => {
-        if(err){
-            resp.status(500).json({err: err.message});
-        } else if (res.rowCount == 0) {
-            resp.status(404).json({msg: `The client with registration number ${registration_number} not found.`});
-        } else {
-            resp.json({msg: `The client with registration number ${registration_number} updated!`, newClient: res.rows});
-        };
-    });
+    if(name && cellphone && registration_number){
+        name = name.toUpperCase();
+        client_repository.putClient(registration_number, name, cellphone, (err, res) => {
+            if(err){
+                resp.status(500).json({err: err.message});
+            } else if (res.rowCount == 0) {
+                resp.status(404).json({msg: `The client with registration number ${registration_number} not found.`});
+            } else {
+                resp.json({msg: `The client with registration number ${registration_number} updated!`, newClient: res.rows});
+            };
+        });
+    } else {
+        resp.status(400).json({msg:"Invalid data entry"});
+    }
 };
 
 exports.removeClients = (req, resp) => {
