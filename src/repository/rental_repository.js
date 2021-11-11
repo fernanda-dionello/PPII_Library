@@ -1,5 +1,11 @@
 const connection = require('../config/connection_bd');
 
+exports.getAllRents = (callback) => {
+    connection.query('SELECT * FROM rents ORDER BY id', (err, res) => {
+        callback(err,res);
+    });
+};
+
 exports.getClientActiveBooks = (client_registration_number, callback) => {
     const registration_number = [client_registration_number];
     connection.query('SELECT count(*) FROM rents WHERE client_registration_number = $1 AND active = true', registration_number, (err, res) => {

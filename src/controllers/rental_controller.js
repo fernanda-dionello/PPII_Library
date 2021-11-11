@@ -1,5 +1,17 @@
 const rental_repository = require('../repository/rental_repository');
 
+exports.listRents = (req, resp) => {
+    rental_repository.getAllRents((err, res) => {
+        if(err){
+            resp.status(500).json({err: err.message});
+        } else if (res.rowCount == 0) {
+            resp.status(404).json({msg: 'No rents found.'});
+        } else {
+            resp.json(res.rows);
+        };
+    });
+};
+
 exports.borrow = (req, resp) => {
     const client_registration_number = req.body.client_registration_number;
     const book_id = req.body.book_id;
