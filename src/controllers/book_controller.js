@@ -28,6 +28,40 @@ exports.listBooksById = (req, resp) => {
     });
 };
 
+exports.listBooksByAuthorId = (req, resp) => {
+    const id = req.params.id;
+
+    author_repository.getAuthorById(id, (err, res) => {
+        if(err){
+            resp.status(500).json({err: err.message});
+        } else if (res.rowCount == 0) {
+            resp.status(404).json({msg: `The author with id ${id} not found.`});
+        } else {
+            book_repository.getBooksByAuthorId(id, (err, res) => {
+                if(err){
+                    resp.status(500).json({err: err.message});
+                } else if (res.rowCount == 0) {
+                    resp.status(404).json({msg: `No books founded for author with id ${id}.`});
+                } else {
+                    resp.json(res.rows);
+                };
+            });
+        };
+    });
+};
+
+exports.listAvailableBooks = (req, resp) => {
+    book_repository.getAvailableBooks((err, res) => {
+        if(err){
+            resp.status(500).json({err: err.message});
+        } else if (res.rowCount == 0) {
+            resp.status(404).json({msg: `No available books founded.`});
+        } else {
+            resp.json(res.rows);
+        };
+    });
+};
+
 exports.createBooks = (req, resp) => {
     let isbn = req.body.isbn;
     let bookName = req.body.name;
