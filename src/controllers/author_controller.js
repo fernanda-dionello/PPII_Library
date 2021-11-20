@@ -100,7 +100,11 @@ exports.removeAuthors = (req, resp) => {
 
     author_repository.deleteAuthor(id, (err, res) => {
         if(err){
-            resp.status(500).json({err: err.message});
+            if(err.code = 23503){
+                resp.status(403).json({err: "Cannot delete author, because author has a vinculation to books table."});
+            } else {
+                resp.status(500).json({err: err.message});
+            }
         } else if (res.rowCount == 0) {
             resp.status(404).json({msg: `The author with id ${id} not found.`});
         } else {

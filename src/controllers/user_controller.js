@@ -1,6 +1,9 @@
 const user_repository = require('../repository/user_repository');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const dotenv = require('dotenv');
+dotenv.config();
+const secret = process.env.SECRET;
 
 exports.userValidation = (req, resp) => {
     const username = req.body.username;
@@ -19,7 +22,7 @@ exports.userValidation = (req, resp) => {
                     const token = jwt.sign({
                         id: res.rows[0].id,
                         nome: res.rows[0].username
-                    }, "SenacRS", {expiresIn: "1h"});
+                    }, secret, {expiresIn: "1h"});
                     resp.status(201).json({"token":token});
                 } else {
                     resp.status(401).json({msg:"Password incorrect."});
@@ -34,7 +37,7 @@ exports.userValidation = (req, resp) => {
 exports.tokenValidation = (req, res, next) => {
     const token = req.get("x-auth-token");
     if(token){
-        jwt.verify(token, "SenacRS", (err, payload) => {
+        jwt.verify(token, secret, (err, payload) => {
             if(err){
                 res.status(403).json({msg:"Invalid Token"});        
             }

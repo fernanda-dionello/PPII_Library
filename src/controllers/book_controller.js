@@ -135,7 +135,11 @@ exports.removeBooks = (req, resp) => {
 
     book_repository.deleteBook(id, (err, res) => {
         if(err){
-            resp.status(500).json({err: err.message});
+            if(err.code = 23503){
+                resp.status(403).json({err: "Cannot delete book, because this book has a vinculation to rents table."});
+            } else {
+                resp.status(500).json({err: err.message});
+            }
         } else if (res.rowCount == 0) {
             resp.status(404).json({msg: `The book with id ${id} not found.`});
         } else {

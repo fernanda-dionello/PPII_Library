@@ -70,7 +70,11 @@ exports.removeClients = (req, resp) => {
 
     client_repository.deleteClient(registration_number, (err, res) => {
         if(err){
-            resp.status(500).json({err: err.message});
+            if(err.code = 23503){
+                resp.status(403).json({err: "Cannot delete client, because the client has a vinculation to rents table."});
+            } else {
+                resp.status(500).json({err: err.message});
+            }
         } else if (res.rowCount == 0) {
             resp.status(404).json({msg: `The client with registration number ${registration_number} not found.`});
         } else {
