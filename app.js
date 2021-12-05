@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors')
 const authRoutes = require('./src/routes/auth_routes');
 const authorRoutes = require('./src/routes/author_routes');
 const bookRoutes = require('./src/routes/book_routes');
@@ -9,6 +10,7 @@ const userController = require('./src/controllers/user_controller');
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 // app.use('/auth', authRoutes);
